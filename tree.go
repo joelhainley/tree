@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strings"
@@ -12,15 +13,32 @@ const ITEM_GLYPH = "\u251C\u2500"
 const LAST_ITEM_GLYPH = "\u2514\u2500"
 const LINE_CONT_GLYPH = "\u2502"
 
+var offsetPrefix string
+var itemGlyph string
+var lastItemGlyph string
+var lineContGlyph string
+var debugMode bool
+
 
 // TODO support the ability to pass in separator (default to '/')
 func main() {
+	// setup the flags
+	flag.StringVar(&offsetPrefix, "offsetPrefix", "   ", "help message for flagname")
+	flag.StringVar(&itemGlyph, "itemGlyph", ITEM_GLYPH, "the item glyph")
+	flag.StringVar(&lastItemGlyph, "lastItemGlyph", LAST_ITEM_GLYPH, "the last item glyph")
+	flag.StringVar(&lineContGlyph, "lineContGlyph", LINE_CONT_GLYPH, "the line cont glyph")
+	flag.BoolVar(&debugMode, "debug", false, "turn on debug mode")
+	flag.Parse()
+
+	if debugMode {
+		fmt.Printf("offsetPrefix set to: [%s]\n", offsetPrefix)
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 	lineCount := 0
 	root := Entry{}
 	root.name = "/"
 	for scanner.Scan() {
-		//fmt.Printf("%d: %s\n", lineCount, scanner.Text())
 		processEntry(scanner.Text(), "/", &root)
 		lineCount++
 	}
@@ -30,6 +48,7 @@ func main() {
 
 type Entry struct {
 	name string
+
 	children[] *Entry
 }
 
@@ -81,10 +100,10 @@ func dumpEntries(entry *Entry, depth int){
 }
 
 func printEntry(entry *Entry, curDepth int, prefix[] string, isLastEntry bool){
-	glyph := ITEM_GLYPH
+	glyph := itemGlyph
 
 	if isLastEntry {
-		glyph = LAST_ITEM_GLYPH
+		glyph = lastItemGlyph
 	}
 
 	if curDepth == 0 {
@@ -107,7 +126,7 @@ func printEntry(entry *Entry, curDepth int, prefix[] string, isLastEntry bool){
 			if isLastEntry {
 				nextPrefix = append(prefix, "" /*LINE_CONT_GLYPH + "b" */)
 			} else {
-				nextPrefix = append(prefix, LINE_CONT_GLYPH)
+				nextPrefix = append(prefix, lineContGlyph)
 			}
 		}
 
@@ -128,7 +147,7 @@ func getPrefixSlug(prefix[] string) string {
 
 	for i := 0; i < len(prefix); i++ {
 		sb.WriteString(prefix[i])
-		sb.WriteString("   ")
+		sb.WriteString(offsetPrefix)
 	}
 	return sb.String()
 }
