@@ -12,21 +12,22 @@ import (
 const ITEM_GLYPH = "\u251C\u2500"
 const LAST_ITEM_GLYPH = "\u2514\u2500"
 const LINE_CONT_GLYPH = "\u2502"
+const DEFAULT_LINE_SEPARATOR = "/"
 
 var offsetPrefix string
 var itemGlyph string
 var lastItemGlyph string
 var lineContGlyph string
 var debugMode bool
+var separator string
 
-
-// TODO support the ability to pass in separator (default to '/')
 func main() {
 	// setup the flags
 	flag.StringVar(&offsetPrefix, "offsetPrefix", "   ", "help message for flagname")
 	flag.StringVar(&itemGlyph, "itemGlyph", ITEM_GLYPH, "the item glyph")
 	flag.StringVar(&lastItemGlyph, "lastItemGlyph", LAST_ITEM_GLYPH, "the last item glyph")
 	flag.StringVar(&lineContGlyph, "lineContGlyph", LINE_CONT_GLYPH, "the line cont glyph")
+	flag.StringVar(&separator, "separator", DEFAULT_LINE_SEPARATOR, "separator")
 	flag.BoolVar(&debugMode, "debug", false, "turn on debug mode")
 	flag.Parse()
 
@@ -39,7 +40,7 @@ func main() {
 	root := Entry{}
 	root.name = "/"
 	for scanner.Scan() {
-		processEntry(scanner.Text(), "/", &root)
+		processEntry(scanner.Text(), separator, &root)
 		lineCount++
 	}
 	var entryPrefix[] string
